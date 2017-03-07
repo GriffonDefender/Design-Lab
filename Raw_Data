@@ -1,0 +1,14 @@
+**This is a file designed purely to hold calculations and data before implementing them into code. Due to the messy nature of math in ASCII,
+please keep all calculations on their own line, with double spaces.**
+
+#Data **This is where miscellaneous data, such as masses and other constants, are kept for reference. Also, any final values from
+calculations can be kept here.**
+
+
+
+#Calculations **This is where any calculations should be put. Even if the calculation is already coded, it doesn't hurt to keep track of
+them here as well.**
+
+
+
+#End of File
