@@ -3,8 +3,8 @@ from tkinter import*
 animation = Tk()
 canvas1 = Canvas(animation, width = 800, height = 800)
 canvas1.pack()
-circle = canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=1)
-square = canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=0)
+circle = canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=1, fill=#A0522D)
+square = canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=0, fill=#FFFF00)
 for x in range(0, 500):
     canvas1.move(circle, 2, 0)
     canvas1.move(square, 0, 2)
