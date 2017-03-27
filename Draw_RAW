@@ -1,13 +1,16 @@
 import time
+import math
 from tkinter import*
+t = 0
 animation = Tk()
-canvas1 = Canvas(animation, width = 800, height = 800)
+canvas1 = Canvas(animation, width = 1080, height = 720)
 canvas1.pack()
-canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=1, fill='#A0522D')
-canvas1.create_polygon(10, 30, 30, 50, 50, 30, 30, 10, smooth=0, fill='#FFFF00')
-for x in range(0, 500):
-    canvas1.move(1, 2, 0)
-    canvas1.move(2, 0, 2)
+canvas1.create_polygon(510, 30, 540, 60, 570, 30, 540, 0, smooth=1, fill='#A0522D', tags='jup')
+canvas1.create_polygon(500, 360, 540, 400, 580, 360, 540, 320, smooth=1, fill='#FFFF00', tags='sun')
+for x in range(0, 18000):
+    t = t + 1
+    canvas1.move(1, math.cos(t/360), math.sin(t/360))
+    canvas1.move(2, 0, 0)
     animation.update()
     time.sleep(0.01)
 else:
