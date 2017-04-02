@@ -1,17 +1,128 @@
+#Import Required Libraries
 import time
 import math
+from msvcrt import getch
 from tkinter import*
+
+#Declare Variables and Constants
+#t = Frames for Jupter
 t = 0
+
+#z = Frames for Earth
+z = 0
+
+#c = Check: 0 = False, 1 = On frame, 2 = After. Has left click been pressed?
+c = 0
+
+#f = frames per second
+f = 0.01
+
+#s = time scaling = 450*f/[Time for earth's orbit = 3.1554075*10^7 s]
+s = 450*f/3.1554075e7
+
+#d = distance scaling = Meters per pixel = (360-10)/[Radius of Jupiter's orbit = 7.785*10^11 m]
+d = 350/7.785e11
+
+#ve = Velocity of the colony escaping earth's orbit = 11185.79 m/s = 11185.79*s/d pixels/s
+ve = 11185.79*(d/s)
+
+#vx = Horizontal component of velocity.
+vx = 0
+
+#vy = Vertical component of velocity
+vy = 0
+
+#vabs = Total velocity, for documentation only
+vabs = 0
+
+#n = number of frames since escaping earth's orbit
+n = 0
+
+#ax = Horizontal component of acceleration
+ax = 0
+
+#ay = Vertical component of acceleration
+ay = 0
+
+#Position Variables for use in gravity
+sun_x = 540
+sun_y = 360
+jup_x = 540
+jup_y = 10
+sat_x = 540
+sat_y = 299
+
+#Constants required for gravitation
+G = 6.67408e-11
+Msun = 1.989e30
+Mjup = 1.898e27
+
+#Create the canvas for animation
 animation = Tk()
 canvas1 = Canvas(animation, width = 1080, height = 720)
 canvas1.pack()
-canvas1.create_polygon(510, 30, 540, 60, 570, 30, 540, 0, smooth=1, fill='#A0522D', tags='jup')
-canvas1.create_polygon(500, 360, 540, 400, 580, 360, 540, 320, smooth=1, fill='#FFFF00', tags='sun')
-for x in range(0, 18000):
-    t = t + 1
-    canvas1.move(1, math.cos(t/360), math.sin(t/360))
-    canvas1.move(2, 0, 0)
+
+#Create Shapes for the involved objects
+canvas1.create_polygon(0, 0, 1080, 0, 1080, 720, 0, 720, fill='black')
+canvas1.create_polygon(530, 10, 540, 20, 550, 10, 540, 0, smooth=1, fill='#A0522D', tags='jup')
+canvas1.create_polygon(480, 360, 540, 420, 600, 360, 540, 300, smooth=1, fill='#FFFF00', tags='sun')
+canvas1.create_polygon(536, 299, 540, 303, 544, 299, 540, 295, smooth=1, fill="#999999", tags='colony')
+canvas1.create_polygon(535, 299, 540, 304, 545, 299, 540, 294, smooth=1, fill='#00cc00', tags = 'earth')
+
+#Frame Updater
+for y in range(0, 36000):
+    z = z + 1
+    
+    #Some strategy using conditions and remainders that coincidentally slowed jupiter's orbit to an acceptable value.
+    if (y % 2.12 <= 1):
+        t = t + 1
+        
+        #Move Jupiter, negative signs are to correct direction of travel.
+        canvas1.move(2, -math.cos(-t/350), -math.sin(-t/350))
+        jup_x = jup_x - math.cos(-t/350)
+        jup_y = jup_y - math.sin(-t/350)
+        
+    #Move Earth
+    canvas1.move(5, -math.cos(-z/61), -math.sin(-z/61))
+    if y == 1248:
+        c = 1
+    #Move The Colony, if still on earth
+    if (c == 0):
+        canvas1.move(4, -math.cos(-z/61), -math.sin(-z/61))
+        sat_x = sat_x - math.cos(-z/61)
+        sat_y = sat_y - math.sin(-z/61)
+        
+    #Move the Colony, once it leaves earth
+    elif (c == 1):
+        vx = -math.cos(-z/61)*ve
+        vy = -math.sin(-z/61)*ve
+        canvas1.move(4, vx*f, vy*f)
+        sat_x = sat_x + vx*f
+        sat_y = sat_y + vy*f
+        c = 2
+    elif (c == 2):
+        ax = ax + G*(((Mjup*((jup_x-sat_x)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_x-sat_x)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))
+        ay = ay + G*(((Mjup*((jup_y-sat_y)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_y-sat_y)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))
+        vx = vx + ax*f
+        vy = vy + ay*f
+        vabs = (vx**2+vy**2)**(1/2)
+        canvas1.move(4, vx*f, vy*f)
+        sat_x = sat_x + vx*f
+        sat_y = sat_y + vy*f
+        
+        #Print Velocity of the colony (in m/s) to the console
+        n = n + 1
+        if n == 1500:
+            print(vabs*(s/d))
+            print(sat_x)
+            print(sat_y)
+            print(jup_x)
+            print(jup_y)
+    
+    #Render the animation
     animation.update()
-    time.sleep(0.01)
+    
+    #Wait until next frame
+    time.sleep(f)
 else:
     quit()
