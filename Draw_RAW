@@ -20,11 +20,11 @@ f = 0.01
 #s = time scaling = 450*f/[Time for earth's orbit = 3.1554075*10^7 s]
 s = 450*f/3.1554075e7
 
-#d = distance scaling = Meters per pixel = (360-10)/[Radius of Jupiter's orbit = 7.785*10^11 m]
+#d = distance scaling = pixels per meter = (360-10)/[Radius of Jupiter's orbit = 7.785*10^11 m]
 d = 350/7.785e11
 
-#ve = Velocity of the colony escaping earth's orbit = 11185.79 m/s = 11185.79*s/d pixels/s
-ve = 11185.79*(d/s)
+#ve = Velocity of the colony escaping earth's orbit = 11185.79 + 29788.6075 (Orbit velocity) m/s = 11185.79*d/s pixels/s
+ve = (11185.79+29788.6075)*(d/s)
 
 #vx = Horizontal component of velocity.
 vx = 0
@@ -35,6 +35,9 @@ vy = 0
 #vabs = Total velocity, for documentation only
 vabs = 0
 
+#l = "Launch Frame". Peak at 1137 for not colliding with jupiter, 1140 for with.
+l = 1137
+
 #n = number of frames since escaping earth's orbit
 n = 0
 
@@ -43,6 +46,9 @@ ax = 0
 
 #ay = Vertical component of acceleration
 ay = 0
+
+#theta = angle between tangential velocities of earth and jupiter at launch
+theta = 0
 
 #Position Variables for use in gravity
 sun_x = 540
@@ -84,7 +90,7 @@ for y in range(0, 36000):
         
     #Move Earth
     canvas1.move(5, -math.cos(-z/61), -math.sin(-z/61))
-    if y == 1248:
+    if y == l:
         c = 1
     #Move The Colony, if still on earth
     if (c == 0):
@@ -99,10 +105,11 @@ for y in range(0, 36000):
         canvas1.move(4, vx*f, vy*f)
         sat_x = sat_x + vx*f
         sat_y = sat_y + vy*f
+        theta = (math.acos(math.cos(-z/61))-math.acos(math.cos(-t/350)))*(180/math.pi)
         c = 2
     elif (c == 2):
-        ax = ax + G*(((Mjup*((jup_x-sat_x)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_x-sat_x)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))
-        ay = ay + G*(((Mjup*((jup_y-sat_y)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_y-sat_y)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))
+        ax = G*(((Mjup*((jup_x-sat_x)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_x-sat_x)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))*(d/s**2)
+        ay = G*(((Mjup*((jup_y-sat_y)/d))/(((jup_x-sat_x)/d)**2+((jup_y-sat_y)/d)**2)**(3/2))+((Msun*((sun_y-sat_y)/d))/(((sun_x-sat_x)/d)**2+((sun_y-sat_y)/d)**2)**(3/2)))*(d/s**2)
         vx = vx + ax*f
         vy = vy + ay*f
         vabs = (vx**2+vy**2)**(1/2)
@@ -114,10 +121,7 @@ for y in range(0, 36000):
         n = n + 1
         if n == 1500:
             print(vabs*(s/d))
-            print(sat_x)
-            print(sat_y)
-            print(jup_x)
-            print(jup_y)
+            print(theta)
     
     #Render the animation
     animation.update()
