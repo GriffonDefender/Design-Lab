@@ -1,7 +1,6 @@
 #Import Required Libraries
 import time
 import math
-from msvcrt import getch
 from tkinter import*
 
 #Declare Variables and Constants
